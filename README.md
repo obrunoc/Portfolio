@@ -44,3 +44,39 @@ O objetivo é transformar dados abertos (Portal da Transparência, IBGE, DataSUS
 ---
 
 ## 📂 Estrutura do Projeto
+
+visualizador-gastos-publicos/
+│── backend/ # API de dados
+│ ├── index.js # servidor Express
+│ ├── routes/ # rotas da API
+│ └── data/ # arquivos CSV iniciais
+│
+│── frontend/ # interface web
+│ ├── src/
+│ │ ├── components/ # componentes (gráficos, tabelas)
+│ │ ├── pages/ # páginas principais
+│ │ └── services/ # consumo da API
+│
+│── README.md # documentação
+
+
+---
+
+## 📌 Roadmap
+- ✅ MVP: selecionar cidade/ano e visualizar gastos em gráfico.
+- 🔄 Integração com APIs oficiais (Portal da Transparência).
+- 📊 Relatórios exportáveis (PDF/Excel).
+- 📈 Dashboard comparativo entre cidades.
+- 🔍 Filtros avançados (período, órgão, categoria detalhada).
+
+---
+
+## 👨‍💻 Público-Alvo
+- Cidadãos que querem entender os gastos da sua cidade.
+- Estudantes e professores em disciplinas de economia, política e dados.
+- Jornalistas e ONGs de transparência.
+
+---
+
+## ✨ Status do Projeto
+🚧 Em desenvolvimento 🚧
