@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Github, Linkedin, Mail, MapPin, Twitter, Facebook } from 'lucide-react';
 
@@ -8,24 +9,22 @@ import { Github, Linkedin, Mail, MapPin, Twitter, Facebook } from 'lucide-react'
 const SITE_CONFIG = {
   name: 'Bruno',
   title: 'Web Developer',
-  subtitle: 'Front End Developer / WordPress Expert',
+  subtitle: 'Front End Developer',
   email: 'bruno@socdefense.com',
-  location: 'Brazópolis, Minas Gerais, Brasil'
+  location: 'Minas Gerais, Brasil'
 };
 
 const NAVIGATION_ITEMS = [
   { id: 'home', label: 'Home' },
-  { id: 'about', label: 'About' },
-  { id: 'skills', label: 'My Skills' },
-  { id: 'work', label: 'Work' },
-  { id: 'contact', label: 'Contact' }
+  { id: 'about', label: 'Sobre' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'work', label: 'Trabalhos' },
+  { id: 'contact', label: 'Contato' }
 ];
 
 const SOCIAL_LINKS = [
-  { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
-  { icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
-  { icon: Facebook, href: 'https://facebook.com', label: 'Facebook' },
-  { icon: Github, href: 'https://github.com', label: 'GitHub' }
+{ icon: Linkedin, href: 'https://www.linkedin.com/in/bruno-c%C3%A9sar-4b7892160/', label: 'LinkedIn' },
+{ icon: Github, href: 'https://github.com/obrunoc', label: 'GitHub' },
 ];
 
 const SKILLS_DATA = [
@@ -373,10 +372,10 @@ const HeroSection = () => {
             `}
           >
             <span className="text-white inline-block hover:scale-110 transition-transform duration-300">
-              Hi,
+              Oi,
             </span>
             <br />
-            <span className="text-white inline-block">I'm </span>
+            <span className="text-white inline-block">Eu sou </span>
             <span
               className="text-transparent bg-clip-text inline-block hover:scale-110 transition-transform duration-300 animate-gradient"
               style={{
@@ -446,7 +445,7 @@ const AboutSection = () => {
               ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}
             `}
           >
-            ABOUT
+            SOBRE
           </h2>
 
           <div className="space-y-6">
@@ -538,7 +537,7 @@ const SkillsSection = () => {
               ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
             `}
           >
-            MY SKILLS
+            SKILLS
           </h2>
 
           <div className="grid md:grid-cols-2 gap-8">
@@ -576,7 +575,7 @@ const WorkSection = () => (
   >
     <div className="container mx-auto px-12">
       <article className="max-w-4xl">
-        <h2 className="text-6xl font-bold text-white mb-12">WORK</h2>
+        <h2 className="text-6xl font-bold text-white mb-12">TRABALHOS</h2>
 
         <div className="space-y-8">
           {EXPERIENCE_DATA.map((exp, index) => (
@@ -602,7 +601,7 @@ const ContactSection = () => (
   >
     <div className="container mx-auto px-12">
       <article className="max-w-4xl">
-        <h2 className="text-6xl font-bold text-white mb-12">CONTACT</h2>
+        <h2 className="text-6xl font-bold text-white mb-12">CONTATO</h2>
 
         <p className="text-gray-300 text-xl mb-12">
           Vamos trabalhar juntos? Entre em contato!
