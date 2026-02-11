@@ -15,6 +15,7 @@ Contato: Formulário simples para entrar em contato comigo por e-mail.
 Design moderno e responsivo: Utilizando TailwindCSS para um layout limpo e adaptável a diferentes dispositivos.
 
 🧰 Tecnologias Utilizadas
+
 Frontend
 
 React.js: Biblioteca para construção da interface de usuário.
@@ -84,13 +85,3 @@ Efeitos de animação: Tornar o site mais dinâmico com transições e animaçõ
 Blog pessoal: Criar uma seção para publicar artigos sobre desenvolvimento, novas tecnologias, e tutoriais.
 
 SEO e Acessibilidade: Melhorar o SEO e a acessibilidade para garantir uma boa experiência de busca e navegação.
-
-📩 Contato
-
-Para entrar em contato comigo, você pode preencher o formulário de Contato ou me encontrar nas redes sociais abaixo:
-
-LinkedIn: linkedin.com/in/seunome
-
-GitHub: github.com/seunome
-
-E-mail: seuemail@example.com
