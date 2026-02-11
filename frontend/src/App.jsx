@@ -404,7 +404,7 @@ const HeroSection = () => {
             onClick={() => scrollToSection('contact')}
             isVisible={isVisible}
           >
-            Contact me!
+            Contate-me!
           </GradientButton>
         </article>
       </div>
