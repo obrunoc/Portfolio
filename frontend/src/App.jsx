@@ -53,9 +53,9 @@ const SKILL_CATEGORIES = [
 
 const EXPERIENCE_DATA = [
   {
-    company: 'Projeto de própria autoria',
-    role: 'Jr Front End Developer',
-    period: '2025 - Presente'
+    company: 'Radar de estágios inteligente',
+    role: 'Jr Front End | Back End Developer',
+    period: '2026'
   }
 ];
 
