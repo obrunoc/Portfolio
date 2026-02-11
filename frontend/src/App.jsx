@@ -53,8 +53,8 @@ const SKILL_CATEGORIES = [
 
 const EXPERIENCE_DATA = [
   {
-    company: 'Radar de estágios inteligente',
-    role: 'Jr Front End | Back End Developer',
+    company: 'Jr Front End | Back End Developer',
+    role: 'Radar de estágios inteligente',
     period: '2026'
   }
 ];
@@ -575,7 +575,7 @@ const WorkSection = () => (
   >
     <div className="container mx-auto px-12">
       <article className="max-w-4xl">
-        <h2 className="text-6xl font-bold text-white mb-12">TRABALHOS</h2>
+        <h2 className="text-6xl font-bold text-white mb-12">PROJETOS</h2>
 
         <div className="space-y-8">
           {EXPERIENCE_DATA.map((exp, index) => (
