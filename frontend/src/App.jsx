@@ -18,7 +18,7 @@ const NAVIGATION_ITEMS = [
   { id: 'home', label: 'Home' },
   { id: 'about', label: 'Sobre' },
   { id: 'skills', label: 'Skills' },
-  { id: 'work', label: '´Projetos' },
+  { id: 'work', label: 'Projetos' },
   { id: 'contact', label: 'Contato' }
 ];
 
