@@ -1,30 +1,31 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
-import { Github, Linkedin, Mail, MapPin, Twitter, Facebook } from 'lucide-react';
+import { Github, Linkedin, Mail, MapPin, Twitter, Facebook, Code, ExternalLink } from 'lucide-react';
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
 
 const SITE_CONFIG = {
-  name: ' Bruno',
+  name: 'Bruno',
   title: 'Web Developer',
-  subtitle: 'Front End Developer',
+  subtitle: 'Front End Developer / WordPress Expert',
   email: 'bruno@socdefense.com',
-  location: 'Minas Gerais, Brasil'
+  location: 'Brazópolis, Minas Gerais, Brasil'
 };
 
 const NAVIGATION_ITEMS = [
-  { id: 'home', label: 'Início' },
-  { id: 'about', label: 'Sobre' },
+  { id: 'inicio', label: 'Início' },
+  { id: 'sobre', label: 'Sobre' },
   { id: 'skills', label: 'Skills' },
-  { id: 'work', label: 'Projetos' },
-  { id: 'contact', label: 'Contato' }
+  { id: 'projetos', label: 'Projetos' }, // NOVA PÁGINA ADICIONADA
+  { id: 'contato', label: 'Contato' }
 ];
 
 const SOCIAL_LINKS = [
-{ icon: Linkedin, href: 'https://www.linkedin.com/in/bruno-c%C3%A9sar-4b7892160/', label: 'LinkedIn' },
-{ icon: Github, href: 'https://github.com/obrunoc', label: 'GitHub' },
+  { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
+  { icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
+  { icon: Facebook, href: 'https://facebook.com', label: 'Facebook' },
+  { icon: Github, href: 'https://github.com', label: 'GitHub' }
 ];
 
 const SKILLS_DATA = [
@@ -36,26 +37,37 @@ const SKILLS_DATA = [
   { name: 'HTML/CSS', level: 85 }
 ];
 
-const SKILL_CATEGORIES = [
+// DADOS DOS PROJETOS - NOVA CONSTANTE
+const PROJECTS_DATA = [
   {
-    title: 'Frontend',
-    items: ['React & Next.js', 'Tailwind CSS', 'Responsive Design']
+    id: 1,
+    title: 'E-commerce Platform',
+    description: 'Plataforma completa de e-commerce com carrinho, pagamentos e painel administrativo.',
+    image: '/images/project1.jpg',
+    technologies: ['React', 'Node.js', 'MongoDB', 'Stripe'],
+    demoLink: 'https://demo.com',
+    githubLink: 'https://github.com/usuario/projeto1',
+    featured: true
   },
   {
-    title: 'Backend',
-    items: ['Node.js', 'APIs RESTful', 'MongoDB']
+    id: 2,
+    title: 'Dashboard Analytics',
+    description: 'Dashboard interativo com gráficos em tempo real e análise de dados.',
+    image: '/images/project2.jpg',
+    technologies: ['React', 'Chart.js', 'Firebase'],
+    demoLink: 'https://demo.com',
+    githubLink: 'https://github.com/usuario/projeto2',
+    featured: false
   },
   {
-    title: 'Tools',
-    items: ['Git & GitHub', 'VS Code', 'Figma']
-  }
-];
-
-const EXPERIENCE_DATA = [
-  {
-    company: 'Jr Front End | Back End Developer',
-    role: 'Radar de estágios inteligente',
-    period: '2026'
+    id: 3,
+    title: 'Portfolio Pessoal',
+    description: 'Site portfolio moderno com animações e design responsivo.',
+    image: '/images/project3.jpg',
+    technologies: ['React', 'Tailwind', 'Framer Motion'],
+    demoLink: 'https://demo.com',
+    githubLink: 'https://github.com/usuario/projeto3',
+    featured: false
   }
 ];
 
@@ -68,30 +80,8 @@ const GRADIENT_COLORS = {
 // CUSTOM HOOKS
 // ============================================================================
 
-const useScrollReveal = (threshold = 0.3) => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold }
-    );
-
-    const element = document.getElementById(window.location.hash.slice(1) || 'home');
-    if (element) observer.observe(element);
-
-    return () => observer.disconnect();
-  }, [threshold]);
-
-  return isVisible;
-};
-
 const useActiveSection = () => {
-  const [activeSection, setActiveSection] = useState('home');
+  const [activeSection, setActiveSection] = useState('inicio');
 
   const scrollToSection = (id) => {
     setActiveSection(id);
@@ -159,145 +149,86 @@ const SocialLink = ({ icon: Icon, href, label }) => (
   </a>
 );
 
-const SkillBar = ({ name, level, isVisible, index }) => (
-  <div
-    className="transition-all duration-1000 hover:scale-105"
-    style={{
-      transitionDelay: `${index * 100}ms`,
-      opacity: isVisible ? 1 : 0,
-      transform: isVisible ? 'translateY(0)' : 'translateY(20px)'
-    }}
-  >
-    <div className="flex justify-between mb-3">
-      <span className="text-white font-medium">{name}</span>
-      <span className="text-cyan-400 font-bold">{level}%</span>
-    </div>
-    <div className="h-3 bg-gray-800 rounded-full overflow-hidden border border-gray-700">
-      <div
-        className="h-full rounded-full shadow-lg shadow-pink-500/50 transition-all duration-1000 ease-out"
-        style={{
-          width: isVisible ? `${level}%` : '0%',
-          background: GRADIENT_COLORS.primary
-        }}
-        role="progressbar"
-        aria-valuenow={level}
-        aria-valuemin="0"
-        aria-valuemax="100"
-        aria-label={`${name} proficiency: ${level}%`}
-      />
-    </div>
-  </div>
-);
+// NOVO COMPONENTE - Card de Projeto
+const ProjectCard = ({ project, index }) => {
+  const [isVisible, setIsVisible] = useState(false);
 
-const SkillCategory = ({ title, items }) => (
-  <div className="group hover:scale-105 transition-transform duration-300">
-    <h3 className="text-white font-bold text-xl mb-4 group-hover:text-cyan-400 transition-colors">
-      {title}
-    </h3>
-    <ul className="space-y-2 text-gray-400">
-      {items.map((item) => (
-        <li
-          key={item}
-          className="group-hover:translate-x-2 transition-transform duration-300"
-        >
-          • {item}
-        </li>
-      ))}
-    </ul>
-  </div>
-);
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), index * 100);
+    return () => clearTimeout(timer);
+  }, [index]);
 
-const GradientButton = ({ onClick, children, isVisible }) => (
-  <button
-    onClick={onClick}
-    className={`
-      relative px-10 py-5 rounded-full group select-none 
-      transition-all duration-1000 delay-500 hover:scale-105 
-      bg-[#0a0a0a]
-      ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
-    `}
-  >
-    <span
-      className="absolute inset-0 rounded-full p-[2px] -z-10"
-      style={{ background: GRADIENT_COLORS.primary }}
+  return (
+    <article
+      className={`
+        group bg-gray-900/50 rounded-2xl overflow-hidden 
+        border border-white/5 hover:border-cyan-400/50 
+        transition-all duration-500
+        ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
+      `}
     >
-      <span className="block w-full h-full bg-[#0a0a0a] rounded-full" />
-    </span>
+      {/* Imagem do Projeto */}
+      <div className="relative h-56 bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Code className="w-16 h-16 text-white/20" />
+        </div>
 
-    <span
-      className="relative z-10 text-transparent bg-clip-text font-bold text-lg"
-      style={{ backgroundImage: GRADIENT_COLORS.primary }}
-    >
-      {children}
-    </span>
-  </button>
-);
+        {/* Overlay no hover */}
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <a
+            href={project.demoLink}
+            className="p-3 bg-cyan-400 rounded-full hover:bg-cyan-300 transition-colors"
+            aria-label="Ver demo"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ExternalLink className="w-5 h-5 text-black" />
+          </a>
+          <a
+            href={project.githubLink}
+            className="p-3 bg-white/10 rounded-full hover:bg-white/20 transition-colors backdrop-blur-sm"
+            aria-label="Ver código"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Github className="w-5 h-5 text-white" />
+          </a>
+        </div>
 
-// ============================================================================
-// DECORATION COMPONENTS
-// ============================================================================
+        {/* Badge se for destaque */}
+        {project.featured && (
+          <div className="absolute top-4 right-4">
+            <span className="px-3 py-1 bg-cyan-400 text-black text-xs rounded-full font-bold">
+              DESTAQUE
+            </span>
+          </div>
+        )}
+      </div>
 
-const AnimatedLines = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    <svg
-      className="absolute right-0 top-1/4 w-2/3 h-2/3 opacity-60 animate-float"
-      viewBox="0 0 800 600"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#ec4899" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.2" />
-        </linearGradient>
-        <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#ec4899" stopOpacity="0.2" />
-        </linearGradient>
-        <linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#a855f7" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.1" />
-        </linearGradient>
-      </defs>
+      {/* Conteúdo do Card */}
+      <div className="p-6">
+        <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
+          {project.title}
+        </h3>
+        <p className="text-gray-400 text-sm mb-4 line-clamp-2">
+          {project.description}
+        </p>
 
-      {[
-        { d: "M 700 100 Q 500 200 600 400 T 400 500", gradient: "gradient1", delay: "0s" },
-        { d: "M 650 150 Q 450 250 550 450 T 350 550", gradient: "gradient2", delay: "0.3s" },
-        { d: "M 600 80 Q 400 180 500 380 T 300 480", gradient: "gradient3", delay: "0.6s" }
-      ].map((path, index) => (
-        <path
-          key={index}
-          d={path.d}
-          stroke={`url(#${path.gradient})`}
-          strokeWidth={2 - index * 0.5}
-          fill="none"
-          strokeDasharray="1000"
-          strokeDashoffset="1000"
-        >
-          <animate
-            attributeName="stroke-dashoffset"
-            from="1000"
-            to="0"
-            dur="3s"
-            begin={path.delay}
-            fill="freeze"
-          />
-        </path>
-      ))}
-    </svg>
-
-    {/* Floating particles */}
-    <div className="absolute top-20 left-1/4 w-2 h-2 bg-pink-500 rounded-full animate-floatSlow blur-sm" aria-hidden="true" />
-    <div className="absolute top-40 right-1/3 w-3 h-3 bg-cyan-400 rounded-full animate-floatMedium blur-sm" aria-hidden="true" />
-    <div className="absolute bottom-32 left-1/3 w-2 h-2 bg-purple-500 rounded-full animate-floatFast blur-sm" aria-hidden="true" />
-  </div>
-);
-
-const BackgroundGlow = () => (
-  <div
-    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse-slow"
-    aria-hidden="true"
-  />
-);
+        {/* Tags de Tecnologias */}
+        <div className="flex flex-wrap gap-2">
+          {project.technologies.map((tech) => (
+            <span
+              key={tech}
+              className="px-3 py-1 bg-white/5 text-gray-400 text-xs rounded-md border border-white/10"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+      </div>
+    </article>
+  );
+};
 
 // ============================================================================
 // LAYOUT COMPONENTS
@@ -346,7 +277,7 @@ const SideMenu = () => {
 // SECTION COMPONENTS
 // ============================================================================
 
-const HeroSection = () => {
+const InicioSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const { scrollToSection } = useActiveSection();
 
@@ -356,12 +287,9 @@ const HeroSection = () => {
 
   return (
     <section
-      id="home"
+      id="inicio"
       className="min-h-screen flex items-center relative bg-[#0a0a0a] select-none overflow-hidden"
     >
-      <AnimatedLines />
-      <BackgroundGlow />
-
       <div className="container mx-auto px-12 relative z-10">
         <article className="max-w-3xl">
           <h2
@@ -371,222 +299,68 @@ const HeroSection = () => {
               ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
             `}
           >
-            <span className="text-white inline-block hover:scale-110 transition-transform duration-300">
-              Oi,
-            </span>
-            <br />
-            <span className="text-white inline-block">Eu sou  </span>
+            <span className="text-white">Olá,</span><br />
+            <span className="text-white">Eu sou </span>
             <span
-              className="text-transparent bg-clip-text inline-block hover:scale-110 transition-transform duration-300 animate-gradient"
-              style={{
-                backgroundImage: GRADIENT_COLORS.primary,
-                backgroundSize: '200% auto'
-              }}
+              className="text-transparent bg-clip-text"
+              style={{ backgroundImage: GRADIENT_COLORS.primary }}
             >
               {SITE_CONFIG.name}
             </span>
-            <span className="text-white">,</span>
-            <br />
+            <span className="text-white">,</span><br />
             <span className="text-white">web developer</span>
           </h2>
 
-          <p
-            className={`
-              text-gray-400 text-lg mb-8 tracking-wide 
-              transition-all duration-1000 delay-300
-              ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
-            `}
-          >
+          <p className={`text-gray-400 text-lg mb-8 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
             {SITE_CONFIG.subtitle}
           </p>
-
-          <GradientButton
-            onClick={() => scrollToSection('contact')}
-            isVisible={isVisible}
-          >
-            Contate-me!
-          </GradientButton>
         </article>
       </div>
     </section>
   );
 };
 
-const AboutSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    const element = document.getElementById('about');
-    if (element) observer.observe(element);
-
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <section
-      id="about"
-      className="min-h-screen flex items-center bg-[#0f0f0f] relative select-none"
-    >
-      <div className="container mx-auto px-12">
-        <article className="max-w-4xl">
-          <h2
-            className={`
-              text-6xl font-bold text-white mb-8 
-              transition-all duration-1000
-              ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}
-            `}
-          >
-            SOBRE
-          </h2>
-
-          <div className="space-y-6">
-            <p
-              className={`
-                text-gray-300 text-lg leading-relaxed 
-                transition-all duration-1000 delay-200
-                ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}
-              `}
-            >
-              Desenvolvedor Front End com foco em criar experiências web incríveis e funcionais.
-              Especializado em HTML, JavaScript, React e Tailwind CSS.
-            </p>
-
-            <p
-              className={`
-                text-gray-300 text-lg leading-relaxed 
-                transition-all duration-1000 delay-400
-                ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}
-              `}
-            >
-              Implemento estratégias eficazes em projetos locais e globais. Minha maior força é a
-              consciência de negócios, que me permite otimizar continuamente infraestrutura e aplicações.
-            </p>
-
-            <address
-              className={`
-                flex items-center gap-3 pt-6 text-gray-400 not-italic
-                transition-all duration-1000 delay-600 hover:text-cyan-400
-                ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}
-              `}
-            >
-              <MapPin className="w-5 h-5 text-cyan-400" aria-hidden="true" />
-              <span>{SITE_CONFIG.location}</span>
-            </address>
-
-            <div
-              className={`
-                flex items-center gap-3 text-gray-400 
-                transition-all duration-1000 delay-700 hover:text-cyan-400
-                ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}
-              `}
-            >
-              <Mail className="w-5 h-5 text-cyan-400" aria-hidden="true" />
-              <a
-                href={`mailto:${SITE_CONFIG.email}`}
-                className="hover:text-cyan-400 transition-colors"
-              >
-                {SITE_CONFIG.email}
-              </a>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-  );
-};
-
-const SkillsSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    const element = document.getElementById('skills');
-    if (element) observer.observe(element);
-
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <section
-      id="skills"
-      className="min-h-screen flex items-center bg-[#0a0a0a] relative select-none"
-    >
-      <div className="container mx-auto px-12">
-        <article className="max-w-4xl">
-          <h2
-            className={`
-              text-6xl font-bold text-white mb-12 
-              transition-all duration-1000
-              ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
-            `}
-          >
-            SKILLS
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {SKILLS_DATA.map((skill, index) => (
-              <SkillBar
-                key={skill.name}
-                {...skill}
-                isVisible={isVisible}
-                index={index}
-              />
-            ))}
-          </div>
-
-          <div
-            className={`
-              mt-16 grid md:grid-cols-3 gap-8 
-              transition-all duration-1000 delay-700
-              ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
-            `}
-          >
-            {SKILL_CATEGORIES.map((category) => (
-              <SkillCategory key={category.title} {...category} />
-            ))}
-          </div>
-        </article>
-      </div>
-    </section>
-  );
-};
-
-const WorkSection = () => (
+const SobreSection = () => (
   <section
-    id="work"
+    id="sobre"
     className="min-h-screen flex items-center bg-[#0f0f0f] relative select-none"
   >
     <div className="container mx-auto px-12">
       <article className="max-w-4xl">
-        <h2 className="text-6xl font-bold text-white mb-12">PROJETOS</h2>
+        <h2 className="text-6xl font-bold text-white mb-8">SOBRE</h2>
+        <p className="text-gray-300 text-lg leading-relaxed mb-6">
+          Desenvolvedor Front End com foco em criar experiências web incríveis e funcionais.
+        </p>
+      </article>
+    </div>
+  </section>
+);
 
-        <div className="space-y-8">
-          {EXPERIENCE_DATA.map((exp, index) => (
-            <article
-              key={index}
-              className="border-l-4 border-cyan-400 pl-8 py-4 hover:border-l-8 hover:translate-x-2 transition-all duration-300"
-            >
-              <h3 className="text-2xl font-bold text-white mb-2">{exp.role}</h3>
-              <p className="text-cyan-400 mb-2">{exp.company}</p>
-              <time className="text-gray-400">{exp.period}</time>
-            </article>
+const SkillsSection = () => (
+  <section
+    id="skills"
+    className="min-h-screen flex items-center bg-[#0a0a0a] relative select-none"
+  >
+    <div className="container mx-auto px-12">
+      <article className="max-w-4xl">
+        <h2 className="text-6xl font-bold text-white mb-12">SKILLS</h2>
+        <div className="grid md:grid-cols-2 gap-8">
+          {SKILLS_DATA.map((skill) => (
+            <div key={skill.name}>
+              <div className="flex justify-between mb-3">
+                <span className="text-white font-medium">{skill.name}</span>
+                <span className="text-cyan-400 font-bold">{skill.level}%</span>
+              </div>
+              <div className="h-3 bg-gray-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${skill.level}%`,
+                    background: GRADIENT_COLORS.primary
+                  }}
+                />
+              </div>
+            </div>
           ))}
         </div>
       </article>
@@ -594,32 +368,88 @@ const WorkSection = () => (
   </section>
 );
 
-const ContactSection = () => (
+// ============================================================================
+// NOVA SEÇÃO - PROJETOS
+// ============================================================================
+
+const ProjetosSection = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    const element = document.getElementById('projetos');
+    if (element) observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section
+      id="projetos"
+      className="min-h-screen flex items-center bg-[#0f0f0f] relative select-none py-20"
+    >
+      <div className="container mx-auto px-12">
+        <article className="max-w-7xl mx-auto">
+          {/* Cabeçalho */}
+          <div className="text-center mb-16">
+            <h2
+              className={`
+                text-6xl font-bold text-white mb-4 
+                transition-all duration-1000
+                ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
+              `}
+            >
+              PROJETOS
+            </h2>
+            <p
+              className={`
+                text-gray-400 text-lg transition-all duration-1000 delay-200
+                ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
+              `}
+            >
+              Confira alguns dos meus trabalhos recentes
+            </p>
+          </div>
+
+          {/* Grid de Projetos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {PROJECTS_DATA.map((project, index) => (
+              <ProjectCard key={project.id} project={project} index={index} />
+            ))}
+          </div>
+        </article>
+      </div>
+    </section>
+  );
+};
+
+const ContatoSection = () => (
   <section
-    id="contact"
+    id="contato"
     className="min-h-screen flex items-center bg-[#0a0a0a] relative select-none"
   >
     <div className="container mx-auto px-12">
       <article className="max-w-4xl">
         <h2 className="text-6xl font-bold text-white mb-12">CONTATO</h2>
-
         <p className="text-gray-300 text-xl mb-12">
           Vamos trabalhar juntos? Entre em contato!
         </p>
-
         <address className="space-y-6 not-italic">
           <a
             href={`mailto:${SITE_CONFIG.email}`}
-            className="flex items-center gap-4 text-xl text-white hover:text-cyan-400 transition-all duration-300 select-text hover:translate-x-2"
+            className="flex items-center gap-4 text-xl text-white hover:text-cyan-400 transition-colors"
           >
-            <Mail className="w-6 h-6 animate-bounce-slow" aria-hidden="true" />
+            <Mail className="w-6 h-6" />
             {SITE_CONFIG.email}
           </a>
-
-          <div className="flex items-center gap-4 text-xl text-white hover:translate-x-2 transition-all duration-300">
-            <MapPin className="w-6 h-6 text-cyan-400" aria-hidden="true" />
-            {SITE_CONFIG.location}
-          </div>
         </address>
       </article>
     </div>
@@ -627,7 +457,7 @@ const ContactSection = () => (
 );
 
 // ============================================================================
-// MAIN APP COMPONENT
+// MAIN APP
 // ============================================================================
 
 function App() {
@@ -636,11 +466,11 @@ function App() {
       <SideMenu />
 
       <main className="ml-64">
-        <HeroSection />
-        <AboutSection />
+        <InicioSection />
+        <SobreSection />
         <SkillsSection />
-        <WorkSection />
-        <ContactSection />
+        <ProjetosSection /> {/* NOVA SEÇÃO ADICIONADA */}
+        <ContatoSection />
       </main>
 
       <style jsx>{`
@@ -660,30 +490,6 @@ function App() {
           to { opacity: 1; }
         }
 
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-20px) rotate(5deg);
-          }
-        }
-
-        @keyframes floatSlow {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(30px, -30px); }
-        }
-
-        @keyframes floatMedium {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(-20px, 40px); }
-        }
-
-        @keyframes floatFast {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(40px, -20px); }
-        }
-
         @keyframes glow {
           0%, 100% {
             box-shadow: 0 0 5px #06b6d4, 0 0 10px #06b6d4;
@@ -691,22 +497,6 @@ function App() {
           50% {
             box-shadow: 0 0 10px #06b6d4, 0 0 20px #06b6d4, 0 0 30px #06b6d4;
           }
-        }
-
-        @keyframes gradient {
-          0% { background-position: 0% center; }
-          50% { background-position: 100% center; }
-          100% { background-position: 0% center; }
-        }
-
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.5; }
-        }
-
-        @keyframes bounce-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-5px); }
         }
 
         .animate-slideInLeft {
@@ -718,36 +508,8 @@ function App() {
           opacity: 0;
         }
 
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-
-        .animate-floatSlow {
-          animation: floatSlow 8s ease-in-out infinite;
-        }
-
-        .animate-floatMedium {
-          animation: floatMedium 6s ease-in-out infinite;
-        }
-
-        .animate-floatFast {
-          animation: floatFast 4s ease-in-out infinite;
-        }
-
         .animate-glow {
           animation: glow 2s ease-in-out infinite;
-        }
-
-        .animate-gradient {
-          animation: gradient 3s ease infinite;
-        }
-
-        .animate-pulse-slow {
-          animation: pulse-slow 4s ease-in-out infinite;
-        }
-
-        .animate-bounce-slow {
-          animation: bounce-slow 2s ease-in-out infinite;
         }
       `}</style>
     </div>
