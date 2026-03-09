@@ -17,7 +17,7 @@ const NAVIGATION_ITEMS = [
   { id: 'inicio', label: 'Início' },
   { id: 'sobre', label: 'Sobre' },
   { id: 'skills', label: 'Skills' },
-  { id: 'projetos', label: 'Projetos' }, // NOVA PÁGINA ADICIONADA
+  { id: 'projetos', label: 'Projetos' },
   { id: 'contato', label: 'Contato' }
 ];
 
