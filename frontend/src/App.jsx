@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Github, Linkedin, Mail, MapPin, Twitter, Facebook, Code, ExternalLink } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Github, Linkedin, Mail, MapPin, Twitter, Facebook, Copy, Plus, Trash2, CheckCheck, Zap, Clock, Terminal } from 'lucide-react';
 
 // ============================================================================
 // CONSTANTS
@@ -18,6 +18,7 @@ const NAVIGATION_ITEMS = [
   { id: 'sobre', label: 'Sobre' },
   { id: 'skills', label: 'Skills' },
   { id: 'projetos', label: 'Projetos' },
+  { id: 'noc-incident-logger', label: 'NOC Incident Logger' }, // << ADICIONADO
   { id: 'contato', label: 'Contato' }
 ];
 
@@ -37,38 +38,9 @@ const SKILLS_DATA = [
   { name: 'HTML/CSS', level: 85 }
 ];
 
-// DADOS DOS PROJETOS - NOVA CONSTANTE
+// DADOS DOS PROJETOS
 const PROJECTS_DATA = [
-  {
-    id: 1,
-    title: 'E-commerce Platform',
-    description: 'Plataforma completa de e-commerce com carrinho, pagamentos e painel administrativo.',
-    image: '/images/project1.jpg',
-    technologies: ['React', 'Node.js', 'MongoDB', 'Stripe'],
-    demoLink: 'https://demo.com',
-    githubLink: 'https://github.com/usuario/projeto1',
-    featured: true
-  },
-  {
-    id: 2,
-    title: 'Dashboard Analytics',
-    description: 'Dashboard interativo com gráficos em tempo real e análise de dados.',
-    image: '/images/project2.jpg',
-    technologies: ['React', 'Chart.js', 'Firebase'],
-    demoLink: 'https://demo.com',
-    githubLink: 'https://github.com/usuario/projeto2',
-    featured: false
-  },
-  {
-    id: 3,
-    title: 'Portfolio Pessoal',
-    description: 'Site portfolio moderno com animações e design responsivo.',
-    image: '/images/project3.jpg',
-    technologies: ['React', 'Tailwind', 'Framer Motion'],
-    demoLink: 'https://demo.com',
-    githubLink: 'https://github.com/usuario/projeto3',
-    featured: false
-  }
+  { id: 1, title: 'Radar de estágios inteligente', role: 'Jr Front End | Back End Developer', year: '2026', link: null }
 ];
 
 const GRADIENT_COLORS = {
@@ -90,6 +62,19 @@ const useActiveSection = () => {
   };
 
   return { activeSection, scrollToSection };
+};
+
+// Hook para animar seções ao entrar na tela
+const useReveal = (id, threshold = 0.15) => {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [id, threshold]);
+  return visible;
 };
 
 // ============================================================================
@@ -149,86 +134,7 @@ const SocialLink = ({ icon: Icon, href, label }) => (
   </a>
 );
 
-// NOVO COMPONENTE - Card de Projeto
-const ProjectCard = ({ project, index }) => {
-  const [isVisible, setIsVisible] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), index * 100);
-    return () => clearTimeout(timer);
-  }, [index]);
-
-  return (
-    <article
-      className={`
-        group bg-gray-900/50 rounded-2xl overflow-hidden 
-        border border-white/5 hover:border-cyan-400/50 
-        transition-all duration-500
-        ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
-      `}
-    >
-      {/* Imagem do Projeto */}
-      <div className="relative h-56 bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Code className="w-16 h-16 text-white/20" />
-        </div>
-
-        {/* Overlay no hover */}
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <a
-            href={project.demoLink}
-            className="p-3 bg-cyan-400 rounded-full hover:bg-cyan-300 transition-colors"
-            aria-label="Ver demo"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <ExternalLink className="w-5 h-5 text-black" />
-          </a>
-          <a
-            href={project.githubLink}
-            className="p-3 bg-white/10 rounded-full hover:bg-white/20 transition-colors backdrop-blur-sm"
-            aria-label="Ver código"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Github className="w-5 h-5 text-white" />
-          </a>
-        </div>
-
-        {/* Badge se for destaque */}
-        {project.featured && (
-          <div className="absolute top-4 right-4">
-            <span className="px-3 py-1 bg-cyan-400 text-black text-xs rounded-full font-bold">
-              DESTAQUE
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Conteúdo do Card */}
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
-          {project.title}
-        </h3>
-        <p className="text-gray-400 text-sm mb-4 line-clamp-2">
-          {project.description}
-        </p>
-
-        {/* Tags de Tecnologias */}
-        <div className="flex flex-wrap gap-2">
-          {project.technologies.map((tech) => (
-            <span
-              key={tech}
-              className="px-3 py-1 bg-white/5 text-gray-400 text-xs rounded-md border border-white/10"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-      </div>
-    </article>
-  );
-};
 
 // ============================================================================
 // LAYOUT COMPONENTS
@@ -288,7 +194,7 @@ const InicioSection = () => {
   return (
     <section
       id="inicio"
-      className="min-h-screen flex items-center relative bg-[#0a0a0a] select-none overflow-hidden"
+      className="min-h-screen flex items-center relative bg-[#0f0f0f] select-none overflow-hidden"
     >
       <div className="container mx-auto px-12 relative z-10">
         <article className="max-w-3xl">
@@ -299,8 +205,8 @@ const InicioSection = () => {
               ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
             `}
           >
-            <span className="text-white">Olá,</span><br />
-            <span className="text-white">Eu sou </span>
+            <span className="text-white">Oi,</span><br />
+            <span className="text-white">Eu sou</span>
             <span
               className="text-transparent bg-clip-text"
               style={{ backgroundImage: GRADIENT_COLORS.primary }}
@@ -312,7 +218,42 @@ const InicioSection = () => {
           </h2>
 
           <p className={`text-gray-400 text-lg mb-8 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-            {SITE_CONFIG.subtitle}
+            Front End Developer
+          </p>
+
+          <button
+            onClick={() => scrollToSection('contato')}
+            className={`transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+            style={{
+              padding: '12px 32px',
+              borderRadius: '9999px',
+              border: '2px solid transparent',
+              backgroundImage: `linear-gradient(#0f0f0f, #0f0f0f), ${GRADIENT_COLORS.primary}`,
+              backgroundOrigin: 'border-box',
+              backgroundClip: 'padding-box, border-box',
+              color: '#ec4899',
+              fontWeight: '600',
+              fontSize: '0.95rem',
+              cursor: 'pointer',
+            }}
+          >
+            Contate-me!
+          </button>
+        </article>
+      </div>
+    </section>
+  );
+};
+
+const SobreSection = () => {
+  const visible = useReveal('sobre');
+  return (
+    <section id="sobre" className="min-h-screen flex items-center bg-[#0f0f0f] relative select-none">
+      <div className="container mx-auto px-12">
+        <article className="max-w-4xl">
+          <h2 className={`text-6xl font-bold text-white mb-8 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>SOBRE</h2>
+          <p className={`text-gray-300 text-lg leading-relaxed mb-6 transition-all duration-700 delay-200 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            Desenvolvedor Front End com foco em criar experiências web incríveis e funcionais.
           </p>
         </article>
       </div>
@@ -320,109 +261,31 @@ const InicioSection = () => {
   );
 };
 
-const SobreSection = () => (
-  <section
-    id="sobre"
-    className="min-h-screen flex items-center bg-[#0f0f0f] relative select-none"
-  >
-    <div className="container mx-auto px-12">
-      <article className="max-w-4xl">
-        <h2 className="text-6xl font-bold text-white mb-8">SOBRE</h2>
-        <p className="text-gray-300 text-lg leading-relaxed mb-6">
-          Desenvolvedor Front End com foco em criar experiências web incríveis e funcionais.
-        </p>
-      </article>
-    </div>
-  </section>
-);
-
-const SkillsSection = () => (
-  <section
-    id="skills"
-    className="min-h-screen flex items-center bg-[#0a0a0a] relative select-none"
-  >
-    <div className="container mx-auto px-12">
-      <article className="max-w-4xl">
-        <h2 className="text-6xl font-bold text-white mb-12">SKILLS</h2>
-        <div className="grid md:grid-cols-2 gap-8">
-          {SKILLS_DATA.map((skill) => (
-            <div key={skill.name}>
-              <div className="flex justify-between mb-3">
-                <span className="text-white font-medium">{skill.name}</span>
-                <span className="text-cyan-400 font-bold">{skill.level}%</span>
-              </div>
-              <div className="h-3 bg-gray-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full"
-                  style={{
-                    width: `${skill.level}%`,
-                    background: GRADIENT_COLORS.primary
-                  }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </article>
-    </div>
-  </section>
-);
-
-// ============================================================================
-// NOVA SEÇÃO - PROJETOS
-// ============================================================================
-
-const ProjetosSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.2 }
-    );
-
-    const element = document.getElementById('projetos');
-    if (element) observer.observe(element);
-
-    return () => observer.disconnect();
-  }, []);
-
+const SkillsSection = () => {
+  const visible = useReveal('skills', 0.2);
   return (
-    <section
-      id="projetos"
-      className="min-h-screen flex items-center bg-[#0f0f0f] relative select-none py-20"
-    >
+    <section id="skills" className="min-h-screen flex items-center bg-[#0a0a0a] relative select-none">
       <div className="container mx-auto px-12">
-        <article className="max-w-7xl mx-auto">
-          {/* Cabeçalho */}
-          <div className="text-center mb-16">
-            <h2
-              className={`
-                text-6xl font-bold text-white mb-4 
-                transition-all duration-1000
-                ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
-              `}
-            >
-              PROJETOS
-            </h2>
-            <p
-              className={`
-                text-gray-400 text-lg transition-all duration-1000 delay-200
-                ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
-              `}
-            >
-              Confira alguns dos meus trabalhos recentes
-            </p>
-          </div>
-
-          {/* Grid de Projetos */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {PROJECTS_DATA.map((project, index) => (
-              <ProjectCard key={project.id} project={project} index={index} />
+        <article className="max-w-4xl">
+          <h2 className={`text-6xl font-bold text-white mb-12 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>SKILLS</h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            {SKILLS_DATA.map((skill, i) => (
+              <div key={skill.name} className={`transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${i * 100 + 200}ms` }}>
+                <div className="flex justify-between mb-3">
+                  <span className="text-white font-medium">{skill.name}</span>
+                  <span className="text-cyan-400 font-bold">{skill.level}%</span>
+                </div>
+                <div className="h-3 bg-gray-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-1000 ease-out"
+                    style={{
+                      width: visible ? `${skill.level}%` : '0%',
+                      background: GRADIENT_COLORS.primary,
+                      transitionDelay: `${i * 120 + 400}ms`,
+                    }}
+                  />
+                </div>
+              </div>
             ))}
           </div>
         </article>
@@ -431,30 +294,527 @@ const ProjetosSection = () => {
   );
 };
 
-const ContatoSection = () => (
-  <section
-    id="contato"
-    className="min-h-screen flex items-center bg-[#0a0a0a] relative select-none"
-  >
-    <div className="container mx-auto px-12">
-      <article className="max-w-4xl">
-        <h2 className="text-6xl font-bold text-white mb-12">CONTATO</h2>
-        <p className="text-gray-300 text-xl mb-12">
-          Vamos trabalhar juntos? Entre em contato!
-        </p>
-        <address className="space-y-6 not-italic">
-          <a
-            href={`mailto:${SITE_CONFIG.email}`}
-            className="flex items-center gap-4 text-xl text-white hover:text-cyan-400 transition-colors"
-          >
-            <Mail className="w-6 h-6" />
-            {SITE_CONFIG.email}
-          </a>
-        </address>
-      </article>
-    </div>
-  </section>
+// ============================================================================
+// SEÇÃO - PROJETOS
+// ============================================================================
+
+const ProjetosSection = () => {
+  const visible = useReveal('projetos');
+  return (
+    <section id="projetos" className="min-h-screen flex items-center bg-[#0f0f0f] relative select-none">
+      <div className="container mx-auto px-12">
+        <article className="max-w-3xl">
+          <h2 className={`text-6xl font-bold text-white mb-14 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>PROJETOS</h2>
+          <div className="space-y-10">
+            {PROJECTS_DATA.map((proj, i) => (
+              <div key={proj.id} className={`flex gap-6 group transition-all duration-700 ${visible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`} style={{ transitionDelay: `${i * 150 + 200}ms` }}>
+                <div className="w-1 rounded-full flex-shrink-0" style={{ background: '#06b6d4', minHeight: '70px' }} />
+                <div>
+                  <h3 className="text-white font-bold text-xl mb-1 group-hover:text-cyan-400 transition-colors">
+                    {proj.link ? <a href={proj.link} target="_blank" rel="noopener noreferrer">{proj.title}</a> : proj.title}
+                  </h3>
+                  <p className="text-cyan-400 text-sm mb-1">{proj.role}</p>
+                  <p className="text-gray-500 text-sm">{proj.year}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+      </div>
+    </section>
+  );
+};
+
+const ContatoSection = () => {
+  const visible = useReveal('contato');
+  return (
+    <section id="contato" className="min-h-screen flex items-center bg-[#0a0a0a] relative select-none">
+      <div className="container mx-auto px-12">
+        <article className="max-w-4xl">
+          <h2 className={`text-6xl font-bold text-white mb-12 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>CONTATO</h2>
+          <p className={`text-gray-300 text-xl mb-12 transition-all duration-700 delay-200 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            Vamos trabalhar juntos? Entre em contato!
+          </p>
+          <address className={`space-y-6 not-italic transition-all duration-700 delay-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <a
+              href={`mailto:${SITE_CONFIG.email}`}
+              className="flex items-center gap-4 text-xl text-white hover:text-cyan-400 transition-colors"
+            >
+              <Mail className="w-6 h-6" />
+              {SITE_CONFIG.email}
+            </a>
+          </address>
+        </article>
+      </div>
+    </section>
+  );
+};
+
+// ============================================================================
+// SEÇÃO - NOC INCIDENT LOGGER  <<<< BLOCO ADICIONADO — NADA ACIMA FOI ALTERADO
+// ============================================================================
+
+function calcSlaEnd(recebimento, slaHoras) {
+  try {
+    const [datePart, timePart] = recebimento.split(' ');
+    const [day, month, year] = datePart.split('/');
+    const [hour, min] = timePart.split(':');
+    const d = new Date(year, month - 1, day, parseInt(hour), parseInt(min));
+    d.setHours(d.getHours() + parseInt(slaHoras));
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  } catch {
+    return '??:??';
+  }
+}
+
+function nowHHMM() {
+  const n = new Date();
+  return `${String(n.getHours()).padStart(2, '0')}:${String(n.getMinutes()).padStart(2, '0')}`;
+}
+
+const TRJ_DATA = {
+  TRJ1: {
+    label: 'TRJ 1',
+    supervisores: [
+      { nome: 'JHUAN', regiao: 'BAIXADA' },
+      { nome: 'DANIEL', regiao: 'OESTE-1 NORTE 1' },
+      { nome: 'MARCUS VINICIUS', regiao: 'OESTE 2' },
+      { nome: 'CARAZZA', regiao: 'INTELIG' },
+    ],
+    formatarRegiao: (sups) => {
+      const partes = sups.map(s => `(${s.nome} - ${s.regiao})`);
+      const linha1 = partes.slice(0, 3).join(' ');
+      const linha2 = partes.slice(3).join(' ');
+      return linha2 ? `${linha1}\n${linha2}` : linha1;
+    },
+  },
+  TRJ2: {
+    label: 'TRJ 2',
+    supervisores: [
+      { nome: 'TIAGO MACEDO', regiao: 'MEIER' },
+      { nome: 'YURI DIAS', regiao: 'CENTRO/SUL/SÃO CRISTÓVÃO' },
+      { nome: 'THIAGO GOMES', regiao: 'TIJUCA' },
+      { nome: 'ES/INTELIG', regiao: 'CARAZA' },
+    ],
+    formatarRegiao: (sups) => sups.map(s => `(${s.nome} — ${s.regiao})`).join(' • '),
+  },
+};
+
+function gerarTexto(form, equipamentos, atualizacoes, regiaoForm) {
+  const slaEnd = calcSlaEnd(form.recebimento, form.sla);
+  const anel = form.anel ? form.anel.toUpperCase() : 'ROC X ALOG';
+  const titulo = `${form.chamado} - ${anel} - RECEBIMENTO ${form.recebimento} (ALTA ${String(form.sla).padStart(2, '0')}H TÉRMINO SLA ${slaEnd})`;
+  const equipFormatado = equipamentos.filter(e => e.trim()).join('\nX\n');
+
+  let blocoRegiao = '';
+  if (regiaoForm && regiaoForm.trj) {
+    const data = TRJ_DATA[regiaoForm.trj];
+    const sups = regiaoForm.selectedSups && regiaoForm.selectedSups.length > 0
+      ? data.supervisores.filter(s => regiaoForm.selectedSups.includes(`${s.nome}|${s.regiao}`))
+      : data.supervisores;
+    const regiaoStr = data.formatarRegiao(sups);
+    const tsk = regiaoForm.tskAtendida ? regiaoForm.tskAtendida.trim() : 'TSKXXX';
+    const tec = regiaoForm.tecnicoAtivo ? regiaoForm.tecnicoAtivo.trim() : 'XXXXX';
+    blocoRegiao = [
+      regiaoForm.trj,
+      `REGIÃO: ${regiaoStr}`,
+      `STATUS: Realizado acionamento junto à operação.`,
+      `No momento, estamos atendendo a TSK ${tsk}, chamado em fila de prioridade do técnico ${tec}.`,
+    ].join('\n');
+  }
+
+  const supervisor = `SUPERVISOR: ${form.supervisor.toUpperCase()}`;
+  const n1n2 = `N1/N2: ${form.n1n2 || ''}`;
+  const tecnico = `TÉCNICO:${form.tecnico.toUpperCase()}`;
+
+  const atuLines = atualizacoes
+    .filter(a => a.hora || a.descricao)
+    .map(a => {
+      let lines = `${a.hora} ${a.descricao}.`;
+      if (a.txDistancia) lines += `\nRocha fibra TX parada em ${a.txDistancia}.`;
+      if (a.rxFibra) lines += `\nFibra RX em ${a.rxFibra} evidenciando dois defeitos na rede.`;
+      return lines;
+    })
+    .join('\n\n');
+
+  return [titulo, equipFormatado, blocoRegiao, [supervisor, n1n2, tecnico].join('\n'), atuLines]
+    .filter(Boolean).join('\n\n').trim();
+}
+
+const NocField = ({ label, value, onChange, placeholder, error, hint }) => (
+  <div className="flex flex-col gap-1">
+    <label className="text-xs uppercase tracking-widest font-mono" style={{ color: error ? '#f87171' : '#6b7280' }}>
+      {label}{error && ' *'}
+    </label>
+    <input
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+      className={`bg-black/40 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none transition-all font-mono border ${
+        error ? 'border-red-500/70 focus:border-red-400' : 'border-white/10 focus:border-cyan-400/60 focus:bg-black/60'
+      }`}
+    />
+    {error && hint && <span className="text-xs text-red-400 font-mono mt-0.5">{hint}</span>}
+  </div>
 );
+
+const NocSectionTitle = ({ icon: Icon, children }) => (
+  <div className="flex items-center gap-2 mb-4 mt-2">
+    <Icon className="w-4 h-4 text-cyan-400" />
+    <span className="text-xs uppercase tracking-widest text-cyan-400 font-mono font-bold">{children}</span>
+    <div className="flex-1 h-px bg-white/5" />
+  </div>
+);
+
+const NocIncidentLoggerSection = () => {
+  const [form, setForm] = useState({
+    chamado: '', recebimento: '', sla: '4', anel: '', supervisor: '', n1n2: '', tecnico: '',
+  });
+  const [equipamentos, setEquipamentos] = useState(['', '']);
+  const [atualizacoes, setAtualizacoes] = useState([{ hora: '', descricao: '', txDistancia: '', rxFibra: '' }]);
+  const [regiaoForm, setRegiaoForm] = useState({ trj: 'TRJ1', tskAtendida: '', tecnicoAtivo: '', selectedSups: [] });
+  const [output, setOutput] = useState('');
+  const [copied, setCopied] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const setField = useCallback((key) => (val) => {
+    setForm(f => ({ ...f, [key]: val }));
+    setErrors(e => ({ ...e, [key]: false }));
+  }, []);
+
+  const addEquip = () => setEquipamentos(e => [...e, '']);
+  const removeEquip = (i) => setEquipamentos(e => e.filter((_, idx) => idx !== i));
+  const setEquip = (i, val) => {
+    setEquipamentos(e => e.map((x, idx) => idx === i ? val : x));
+    setErrors(e => ({ ...e, equipamentos: false }));
+  };
+
+  const addAtu = () => setAtualizacoes(a => [...a, { hora: nowHHMM(), descricao: '', txDistancia: '', rxFibra: '' }]);
+  const removeAtu = (i) => setAtualizacoes(a => a.filter((_, idx) => idx !== i));
+  const setAtu = (i, key, val) => {
+    setAtualizacoes(a => a.map((x, idx) => idx === i ? { ...x, [key]: val } : x));
+    if (key === 'descricao') setErrors(e => ({ ...e, [`atu_${i}`]: false }));
+  };
+
+  const gerar = () => {
+    const newErrors = {};
+    const recebimentoValido = /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/.test(form.recebimento.trim());
+    if (!recebimentoValido) newErrors.recebimento = true;
+    if (!form.supervisor.trim()) newErrors.supervisor = true;
+    if (!form.tecnico.trim()) newErrors.tecnico = true;
+    if (!equipamentos.some(e => e.trim())) newErrors.equipamentos = true;
+    atualizacoes.forEach((a, i) => {
+      if (!a.descricao.trim()) newErrors[`atu_${i}`] = true;
+    });
+    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
+    setErrors({});
+    setOutput(gerarTexto(form, equipamentos, atualizacoes, regiaoForm));
+  };
+
+  const copiar = () => {
+    navigator.clipboard.writeText(output).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const slaEnd = form.recebimento && form.sla ? calcSlaEnd(form.recebimento, form.sla) : null;
+
+  return (
+    <section
+      id="noc-incident-logger"
+      className="min-h-screen flex items-start bg-[#0a0a0a] relative select-none py-20"
+    >
+      <div className="container mx-auto px-12 relative z-10 w-full">
+        <div className="mb-10">
+          <h2 className="text-6xl font-bold text-white mb-2">NOC Incident Logger</h2>
+          <p className="text-gray-400 text-lg">Gerador de Registro de Incidente · N1 Tools</p>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          {/* ── ESQUERDA: FORMULÁRIO ── */}
+          <div className="space-y-6">
+
+            {/* 1. Dados do Chamado */}
+            <div className="bg-gray-900/40 border border-white/5 rounded-2xl p-6">
+              <NocSectionTitle icon={Zap}>Dados do Chamado</NocSectionTitle>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <NocField label="Chamado" value={form.chamado} onChange={setField('chamado')} placeholder="TSK260300210502" />
+                </div>
+                <div className="col-span-2 sm:col-span-1">
+                  <NocField label="Recebimento" value={form.recebimento} onChange={setField('recebimento')} placeholder="09/03/2026 16:21" error={errors.recebimento} hint="Use o formato DD/MM/AAAA HH:MM" />
+                </div>
+                <div className="col-span-2 sm:col-span-1 flex flex-col gap-1">
+                  <label className="text-xs text-gray-500 uppercase tracking-widest font-mono">SLA (horas)</label>
+                  <div className="flex gap-2">
+                    {['2', '4', '8', '24'].map(h => (
+                      <button
+                        key={h}
+                        onClick={() => setField('sla')(h)}
+                        className={`flex-1 py-2 rounded-lg text-sm font-mono font-bold transition-all border ${
+                          form.sla === h
+                            ? 'bg-cyan-400/10 border-cyan-400 text-cyan-400'
+                            : 'bg-black/20 border-white/10 text-gray-500 hover:border-white/20'
+                        }`}
+                      >
+                        {h}h
+                      </button>
+                    ))}
+                  </div>
+                  {slaEnd && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <Clock className="w-3 h-3 text-pink-400" />
+                      <span className="text-xs text-pink-400 font-mono">Término SLA: {slaEnd}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="col-span-2">
+                  <NocField label="Anel" value={form.anel} onChange={setField('anel')} placeholder="DIST OCHA X POP DDC" />
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Site */}
+            <div className={`bg-gray-900/40 rounded-2xl p-6 border ${errors.equipamentos ? 'border-red-500/40' : 'border-white/5'}`}>
+              <NocSectionTitle icon={Terminal}>Site</NocSectionTitle>
+              {errors.equipamentos && <p className="text-xs text-red-400 font-mono mb-3">Adicione ao menos um equipamento</p>}
+              <div className="space-y-2">
+                {equipamentos.map((eq, i) => (
+                  <div key={i} className="flex gap-2 items-center">
+                    <span className="text-xs text-gray-600 font-mono w-4">{i + 1}</span>
+                    <input
+                      value={eq}
+                      onChange={e => setEquip(i, e.target.value)}
+                      placeholder="RNDIRJO-RJO03-01 @Interface: esat-1/1/27"
+                      className="flex-1 bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400/60 transition-all font-mono"
+                    />
+                    {equipamentos.length > 1 && (
+                      <button onClick={() => removeEquip(i)} className="text-gray-600 hover:text-red-400 transition-colors">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button onClick={addEquip} className="mt-3 flex items-center gap-2 text-xs text-gray-500 hover:text-cyan-400 transition-colors font-mono">
+                <Plus className="w-3 h-3" /> Adicionar equipamento
+              </button>
+            </div>
+
+            {/* 3. Script Obrigatório */}
+            <div className="bg-gray-900/40 border border-white/5 rounded-2xl p-6 space-y-4">
+              <NocSectionTitle icon={MapPin}>Script Obrigatório</NocSectionTitle>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-gray-500 uppercase tracking-widest font-mono">Selecione o TRJ</label>
+                <div className="flex gap-3">
+                  {Object.keys(TRJ_DATA).map(trj => (
+                    <button
+                      key={trj}
+                      onClick={() => setRegiaoForm(r => ({ ...r, trj, selectedSups: [] }))}
+                      className={`flex-1 py-2.5 rounded-lg text-sm font-mono font-bold transition-all border ${
+                        regiaoForm.trj === trj
+                          ? 'bg-cyan-400/10 border-cyan-400 text-cyan-400'
+                          : 'bg-black/20 border-white/10 text-gray-500 hover:border-white/20'
+                      }`}
+                    >
+                      {TRJ_DATA[trj].label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-gray-500 uppercase tracking-widest font-mono">Supervisor responsável</label>
+                <div className="flex flex-wrap gap-2">
+                  {TRJ_DATA[regiaoForm.trj].supervisores.map(s => {
+                    const key = `${s.nome}|${s.regiao}`;
+                    const selected = regiaoForm.selectedSups.includes(key);
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => setRegiaoForm(r => ({ ...r, selectedSups: selected ? [] : [key] }))}
+                        className={`px-3 py-2 rounded-lg text-xs font-mono transition-all border text-left ${
+                          selected
+                            ? 'bg-cyan-400/15 border-cyan-400 text-cyan-300'
+                            : 'bg-black/20 border-white/10 text-gray-400 hover:border-white/25 hover:text-gray-200'
+                        }`}
+                      >
+                        {selected && <span className="text-cyan-400 mr-1">✓</span>}
+                        <span className="font-bold">{s.nome}</span>
+                        <span className="opacity-50 ml-1">· {s.regiao}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {regiaoForm.selectedSups.length === 0 && (
+                  <p className="text-xs text-gray-600 font-mono mt-1">Nenhum selecionado — todos aparecerão</p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-gray-500 uppercase tracking-widest font-mono">TSK em fila</label>
+                  <input
+                    value={regiaoForm.tskAtendida}
+                    onChange={e => setRegiaoForm(r => ({ ...r, tskAtendida: e.target.value }))}
+                    placeholder="TSK260300206461"
+                    className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400/60 transition-all font-mono"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-gray-500 uppercase tracking-widest font-mono">Técnico em fila</label>
+                  <input
+                    value={regiaoForm.tecnicoAtivo}
+                    onChange={e => setRegiaoForm(r => ({ ...r, tecnicoAtivo: e.target.value }))}
+                    placeholder="Gaspar"
+                    className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400/60 transition-all font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Responsáveis */}
+            <div className="bg-gray-900/40 border border-white/5 rounded-2xl p-6">
+              <NocSectionTitle icon={Zap}>Responsáveis</NocSectionTitle>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2 sm:col-span-1">
+                  <NocField label="Supervisor" value={form.supervisor} onChange={setField('supervisor')} placeholder="Yuri Dias" error={errors.supervisor} hint="Campo obrigatório" />
+                </div>
+                <div className="col-span-2 sm:col-span-1">
+                  <NocField label="N1/N2" value={form.n1n2} onChange={setField('n1n2')} placeholder="-" />
+                </div>
+                <div className="col-span-2">
+                  <NocField label="Técnico" value={form.tecnico} onChange={setField('tecnico')} placeholder="Eduardo Valviesse" error={errors.tecnico} hint="Campo obrigatório" />
+                </div>
+              </div>
+            </div>
+
+            {/* 5. Atualizações */}
+            <div className="bg-gray-900/40 border border-white/5 rounded-2xl p-6">
+              <NocSectionTitle icon={Clock}>Atualizações</NocSectionTitle>
+              <div className="space-y-4">
+                {atualizacoes.map((a, i) => (
+                  <div key={i} className="border border-white/5 rounded-xl p-4 bg-black/20 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-cyan-400/60 font-mono">Atualização #{i + 1}</span>
+                      {atualizacoes.length > 1 && (
+                        <button onClick={() => removeAtu(i)} className="text-gray-600 hover:text-red-400 transition-colors">
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="col-span-1">
+                        <label className="text-xs text-gray-500 uppercase tracking-widest font-mono block mb-1">Hora</label>
+                        <div className="flex gap-1">
+                          <input
+                            value={a.hora}
+                            onChange={e => setAtu(i, 'hora', e.target.value)}
+                            placeholder="17:29"
+                            className="flex-1 min-w-0 bg-black/40 border border-white/10 rounded-lg px-2 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400/60 transition-all font-mono"
+                          />
+                          <button
+                            onClick={() => setAtu(i, 'hora', nowHHMM())}
+                            title="Hora atual"
+                            className="px-2 bg-cyan-400/10 border border-cyan-400/30 rounded-lg text-cyan-400 hover:bg-cyan-400/20 transition-all"
+                          >
+                            <Clock className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="col-span-2">
+                        <label className="text-xs text-gray-500 uppercase tracking-widest font-mono block mb-1">Descrição</label>
+                        <input
+                          value={a.descricao}
+                          onChange={e => setAtu(i, 'descricao', e.target.value)}
+                          placeholder="Equipe informa medições"
+                          className={`w-full bg-black/40 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none transition-all font-mono border ${
+                            errors[`atu_${i}`] ? 'border-red-500/70 focus:border-red-400' : 'border-white/10 focus:border-cyan-400/60'
+                          }`}
+                        />
+                        {errors[`atu_${i}`] && <span className="text-xs text-red-400 font-mono mt-0.5 block">Descrição obrigatória</span>}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs text-gray-500 uppercase tracking-widest font-mono block mb-1">Distância TX</label>
+                        <input
+                          value={a.txDistancia}
+                          onChange={e => setAtu(i, 'txDistancia', e.target.value)}
+                          placeholder="3857m"
+                          className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400/60 transition-all font-mono"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 uppercase tracking-widest font-mono block mb-1">Fibra RX</label>
+                        <input
+                          value={a.rxFibra}
+                          onChange={e => setAtu(i, 'rxFibra', e.target.value)}
+                          placeholder="14.505km"
+                          className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400/60 transition-all font-mono"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={addAtu} className="mt-3 flex items-center gap-2 text-xs text-gray-500 hover:text-cyan-400 transition-colors font-mono">
+                <Plus className="w-3 h-3" /> Adicionar atualização
+              </button>
+            </div>
+
+            {/* Botão Gerar */}
+            <button
+              onClick={gerar}
+              className="w-full py-4 rounded-xl font-bold text-black text-sm tracking-widest uppercase font-mono transition-all hover:opacity-90 hover:scale-[1.01] active:scale-[0.99]"
+              style={{ background: GRADIENT_COLORS.primary }}
+            >
+              ⚡ Gerar Texto para DOCS
+            </button>
+          </div>
+
+          {/* ── DIREITA: SAÍDA ── */}
+          <div className="flex flex-col">
+            <div className="bg-gray-900/40 border border-white/5 rounded-2xl p-6 flex flex-col flex-1 sticky top-8">
+              <div className="flex items-center justify-between mb-4">
+                <NocSectionTitle icon={Terminal}>Saída Gerada</NocSectionTitle>
+                {output && (
+                  <button
+                    onClick={copiar}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-all border ${
+                      copied
+                        ? 'bg-green-400/10 border-green-400/50 text-green-400'
+                        : 'bg-cyan-400/10 border-cyan-400/30 text-cyan-400 hover:bg-cyan-400/20'
+                    }`}
+                  >
+                    {copied ? <CheckCheck className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                    {copied ? 'Copiado!' : 'Copiar'}
+                  </button>
+                )}
+              </div>
+
+              {output ? (
+                <pre className="flex-1 font-mono text-xs text-gray-300 whitespace-pre-wrap leading-relaxed bg-black/40 rounded-xl p-4 border border-white/5 overflow-auto min-h-[400px]">
+                  {output}
+                </pre>
+              ) : (
+                <div className="flex-1 flex flex-col items-center justify-center min-h-[400px] text-center">
+                  <div className="w-16 h-16 rounded-2xl mb-4 flex items-center justify-center border border-white/5 bg-white/5">
+                    <Terminal className="w-7 h-7 text-gray-600" />
+                  </div>
+                  <p className="text-gray-600 text-sm font-mono">Preencha o formulário e clique em</p>
+                  <p className="text-gray-500 text-xs font-mono mt-1">⚡ Gerar Texto para DOCS</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 // ============================================================================
 // MAIN APP
@@ -463,13 +823,41 @@ const ContatoSection = () => (
 function App() {
   return (
     <div className="bg-black">
+
+      {/* ── PARTÍCULAS GLOBAIS ── */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }} aria-hidden="true">
+        {[
+          { top:  '5%', left: '18%', color: '#ec4899', dur: '16s', delay:  '0s'  },
+          { top: '12%', left: '74%', color: '#06b6d4', dur: '22s', delay: '-6s'  },
+          { top: '28%', left: '42%', color: '#a855f7', dur: '19s', delay: '-11s' },
+          { top: '38%', left: '88%', color: '#ec4899', dur: '25s', delay: '-3s'  },
+          { top: '52%', left:  '8%', color: '#06b6d4', dur: '20s', delay: '-15s' },
+          { top: '61%', left: '55%', color: '#a855f7', dur: '18s', delay: '-8s'  },
+          { top: '74%', left: '32%', color: '#ec4899', dur: '23s', delay: '-13s' },
+          { top: '82%', left: '80%', color: '#06b6d4', dur: '17s', delay: '-4s'  },
+          { top: '91%', left: '60%', color: '#a855f7', dur: '21s', delay: '-9s'  },
+        ].map((p, i) => (
+          <div key={i} className="animate-gparticle" style={{
+            position: 'absolute',
+            top: p.top, left: p.left,
+            width: '3px', height: '3px',
+            borderRadius: '50%',
+            background: p.color,
+            boxShadow: `0 0 6px 2px ${p.color}88`,
+            animationDuration: p.dur,
+            animationDelay: p.delay,
+          }} />
+        ))}
+      </div>
+
       <SideMenu />
 
-      <main className="ml-64">
+      <main className="ml-64" style={{ position: 'relative', zIndex: 1 }}>
         <InicioSection />
         <SobreSection />
         <SkillsSection />
-        <ProjetosSection /> {/* NOVA SEÇÃO ADICIONADA */}
+        <ProjetosSection />
+        <NocIncidentLoggerSection />
         <ContatoSection />
       </main>
 
@@ -510,6 +898,28 @@ function App() {
 
         .animate-glow {
           animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes drift {
+          0%   { transform: translate(0px,  0px);  opacity: 0.5; }
+          33%  { transform: translate(8px, -14px); opacity: 0.9; }
+          66%  { transform: translate(-6px, -8px); opacity: 0.6; }
+          100% { transform: translate(0px,  0px);  opacity: 0.5; }
+        }
+
+        .animate-particle {
+          animation: drift ease-in-out infinite;
+        }
+
+        @keyframes linearFloat {
+          0%   { transform: translateY(0px);   opacity: 0;   }
+          10%  { opacity: 0.8; }
+          90%  { opacity: 0.6; }
+          100% { transform: translateY(-120px); opacity: 0; }
+        }
+
+        .animate-gparticle {
+          animation: linearFloat linear infinite;
         }
       `}</style>
     </div>
